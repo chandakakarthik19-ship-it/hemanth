@@ -17,7 +17,7 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://Karthik:Admin123@clust
 const JWT_SECRET = process.env.JWT_SECRET || "secret123";
 
 mongoose.connect(MONGO_URI)
-  .then(()=> console.log('MongoDB connected'))
+  .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connect error', err));
 
 const Admin = require('./models/Admin');
@@ -32,19 +32,29 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/farmer', farmerRoutes);
 app.use('/api/work', workRoutes);
 
+// ✅ Root route (must come after API routes)
+app.get('/', (req, res) => {
+  res.send('🚀 Express server is running successfully!');
+});
+
+// ✅ Optional catch-all route for other undefined paths
+app.use((req, res) => {
+  res.status(404).send('🚀 Express server is running successfully!');
+});
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, ()=> console.log('Server running on port', PORT));
+app.listen(PORT, () => console.log('Server running on port', PORT));
 
 // Create default admin if none exist
-(async ()=>{
-  try{
+(async () => {
+  try {
     const count = await Admin.countDocuments();
-    if(count === 0){
+    if (count === 0) {
       const a = new Admin({ username: 'admin', password: 'admin123' }); // password will be hashed in model
       await a.save();
       console.log('Created default admin -> username: admin password: admin123');
     }
-  }catch(e){
+  } catch (e) {
     console.error(e);
   }
 })();
